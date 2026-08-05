@@ -30,11 +30,6 @@ public class ApiResponse<T>{
                     .body(new ApiResponse<>(true, message, data));
         }
 
-        public static ResponseEntity<ApiResponse<Void>> deleted(String message) {
-            return ResponseEntity.ok(
-                    new ApiResponse<>(true, message, null)
-            );
-        }
     }
 }
 

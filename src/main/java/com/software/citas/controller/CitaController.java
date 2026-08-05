@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/citas")
+@RequestMapping("/api/citas")
 public class CitaController {
 
     private final CitaService citaService;
@@ -59,9 +59,7 @@ public class CitaController {
 
         citaService.delete(id);
 
-        return ApiResponse.ApiResponses.deleted(
-                "Cita eliminada correctamente"
-        );
+        return ResponseEntity.noContent().build();
     }
 
 
