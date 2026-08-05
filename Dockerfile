@@ -1,11 +1,15 @@
-FROM gradle:8.10.2-jdk17 AS build
+# ---------- Etapa de compilación ----------
+FROM eclipse-temurin:17-jdk AS build
 
 WORKDIR /app
 
 COPY . .
 
-RUN gradle clean bootJar --no-daemon
+RUN chmod +x gradlew
 
+RUN ./gradlew clean bootJar --no-daemon
+
+# ---------- Etapa de ejecución ----------
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
