@@ -6,7 +6,6 @@ import com.software.citas.dto.request.CreateCitaRequest;
 import com.software.citas.dto.request.UpdateCitaRequest;
 import com.software.citas.service.CitaService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class CitaController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CitaResponse>> create(@Validated @RequestBody CreateCitaRequest request) {
+    public ResponseEntity<ApiResponse<CitaResponse>> create( @RequestBody CreateCitaRequest request) {
         return ApiResponse.ApiResponses.created(
                 "Cita creada correctamente.",
                 citaService.create(request)
