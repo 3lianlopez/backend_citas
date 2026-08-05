@@ -4,6 +4,7 @@ import com.software.citas.dto.response.CitaResponse;
 import com.software.citas.dto.request.CreateCitaRequest;
 import com.software.citas.dto.request.UpdateCitaRequest;
 import com.software.citas.entity.Cita;
+import com.software.citas.exception.ResourceNotFoundException;
 import com.software.citas.mapper.CitaMapper;
 import com.software.citas.repository.CitaRepository;
 import com.software.citas.service.CitaService;
@@ -26,21 +27,9 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public CitaResponse create(CreateCitaRequest request) {
-
-        Cita cita = new Cita();
-
-        cita.setTipoCita(request.getTipoCita());
-        cita.setFecha(request.getFecha());
-        cita.setHora(request.getHora());
-
-        Cita citaGuardada = citaRepository.save(cita);
-
-        return new CitaResponse(
-                citaGuardada.getId(),
-                citaGuardada.getTipoCita(),
-                citaGuardada.getFecha(),
-                citaGuardada.getHora()
-        );
+        Cita cita = citaMapper.toEntity(request);
+        cita = citaRepository.save(cita);
+        return citaMapper.toResponse(cita);
     }
 
 
@@ -55,31 +44,29 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public CitaResponse update(Long id, UpdateCitaRequest request) {
-
         Cita cita = citaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("La cita con id " + id + " no existe."));
         cita.setTipoCita(request.getTipoCita());
-        cita.setFecha(request.getFecha());
         cita.setHora(request.getHora());
+        cita.setFecha(request.getFecha());
 
-        Cita citaActualizada = citaRepository.save(cita);
+        cita = citaRepository.save(cita);
 
-        return new CitaResponse(
-                citaActualizada.getId(),
-                citaActualizada.getTipoCita(),
-                citaActualizada.getFecha(),
-                citaActualizada.getHora()
-        );
+        return citaMapper.toResponse(cita);
     }
 
     @Override
     public void delete(Long id) {
 
-        if (!citaRepository.existsById(id)) {
-            throw new RuntimeException("La cita no existe");
-        }
+        Cita cita = citaRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("La cita con id " + id + " no existe."));
+        citaRepository.delete(cita);
+    }
 
-        citaRepository.deleteById(id);
+    @Override
+    public CitaResponse findById(Long id) {
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("La cita con id " + id + " no existe."));
+        return citaMapper.toResponse(cita);
     }
 }

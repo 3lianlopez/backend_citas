@@ -15,4 +15,6 @@ public interface CitaService {
     CitaResponse update(Long id, UpdateCitaRequest request);
 
     void delete(Long id);
+
+    CitaResponse findById(Long id);
 }
