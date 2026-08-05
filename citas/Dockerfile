@@ -1,19 +1,21 @@
-# Etapa de compilación
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+# ---------- Etapa de compilación ----------
+FROM gradle:8.10.2-jdk17 AS build
 
 WORKDIR /app
 
-COPY .. .
+COPY . .
 
-RUN mvn clean package -DskipTests
+RUN chmod +x gradlew
 
-# Etapa de ejecución
+RUN ./gradlew clean bootJar --no-daemon
+
+# ---------- Etapa de ejecución ----------
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
