@@ -11,6 +11,9 @@
         <module name="com.software.citas.test" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="com.software.citas" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
