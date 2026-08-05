@@ -36,7 +36,7 @@ public class CitaController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CitaResponse>> findById(@PathVariable Long id){
 
-        return ApiResponse.ApiResponses.created(
+        return ApiResponse.ApiResponses.ok(
                 "Cita encontrada correctamente.",
                 citaService.findById(id)
         );

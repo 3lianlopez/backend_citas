@@ -44,16 +44,15 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public CitaResponse update(Long id, UpdateCitaRequest request) {
-//        Cita cita = citaRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("La cita con id " + id + " no existe."));
-//        cita.setTipoCita(request.getTipoCita());
-//        cita.setHora(request.getHora());
-//        cita.setFecha(request.getFecha());
-//
-//        cita = citaRepository.save(cita);
-//
-//        return citaMapper.toResponse(cita);
-        throw new RuntimeException("ENTRO AL PUT");
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("La cita con id " + id + " no existe."));
+        cita.setTipoCita(request.getTipoCita());
+        cita.setHora(request.getHora());
+        cita.setFecha(request.getFecha());
+
+        cita = citaRepository.save(cita);
+
+        return citaMapper.toResponse(cita);
     }
 
     @Override
