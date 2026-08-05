@@ -1,7 +1,6 @@
 package com.software.citas.mapper;
 
 import com.software.citas.dto.request.CreateCitaRequest;
-import com.software.citas.dto.request.UpdateCitaRequest;
 import com.software.citas.dto.response.CitaResponse;
 import com.software.citas.entity.Cita;
 import org.springframework.stereotype.Component;
@@ -28,11 +27,5 @@ public class CitaMapper {
                 .build();
     }
 
-    public void updateEntity(UpdateCitaRequest request, Cita cita) {
-
-        cita.setTipoCita(request.getTipoCita());
-        cita.setFecha(request.getFecha());
-        cita.setHora(request.getHora());
-    }
 
 }

@@ -5,7 +5,6 @@ import com.software.citas.dto.response.CitaResponse;
 import com.software.citas.dto.request.CreateCitaRequest;
 import com.software.citas.dto.request.UpdateCitaRequest;
 import com.software.citas.service.CitaService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
