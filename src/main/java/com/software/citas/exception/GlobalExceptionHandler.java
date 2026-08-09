@@ -91,4 +91,19 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(
+            IllegalStateException exception) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(
+                        new ApiResponse<>(
+                                false,
+                                exception.getMessage(),
+                                null
+                        )
+                );
+    }
+
 }

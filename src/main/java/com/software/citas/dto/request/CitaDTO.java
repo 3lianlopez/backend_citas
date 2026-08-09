@@ -1,6 +1,7 @@
 package com.software.citas.dto.request;
 
 
+import com.software.citas.enums.EstadoCita;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -11,7 +12,13 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateCitaRequest {
+public class CitaDTO {
+
+    private String documento;
+
+    private String nombres;
+
+    private String apellidos;
 
     private String tipoCita;
 
