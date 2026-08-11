@@ -90,6 +90,33 @@ public class GlobalExceptionHandler {
                         null
                 ));
     }
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOtp(
+            InvalidOtpException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(buildError(
+                        HttpStatus.BAD_REQUEST,
+                        ex.getMessage(),
+                        request
+                ));
+    }
+
+    @ExceptionHandler(OtpLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleOtpLimitExceeded(
+            OtpLimitExceededException ex,
+            HttpServletRequest request) {
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(buildError(
+                        HttpStatus.TOO_MANY_REQUESTS,
+                        ex.getMessage(),
+                        request
+                ));
+    }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(
