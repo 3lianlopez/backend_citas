@@ -42,6 +42,14 @@ public class AuthService {
             );
         }
 
+        long inicio = System.currentTimeMillis();
+
+        String passwordHash = passwordEncoder.encode(request.getPassword());
+
+        long fin = System.currentTimeMillis();
+
+        System.out.println("Hash: " + (fin - inicio) + " ms");
+
         Usuario usuario = Usuario.builder()
                 .nombres(request.getNombres().trim())
                 .apellidos(request.getApellidos().trim())
