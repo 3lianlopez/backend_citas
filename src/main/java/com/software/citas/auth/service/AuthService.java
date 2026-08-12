@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 
 @Service
@@ -42,13 +43,6 @@ public class AuthService {
             );
         }
 
-        long inicio = System.currentTimeMillis();
-
-        String passwordHash = passwordEncoder.encode(request.getPassword());
-
-        long fin = System.currentTimeMillis();
-
-        System.out.println("Hash: " + (fin - inicio) + " ms");
 
         Usuario usuario = Usuario.builder()
                 .nombres(request.getNombres().trim())
@@ -66,7 +60,7 @@ public class AuthService {
     }
 
     public void requestOtp(String email) {
-        Usuario usuario = buscarUsuario(email);
+        Usuario usuario = buscarUsuario(normalizarEmail(email));
 
         if (Boolean.TRUE.equals(usuario.getActivo())) {
             throw new ResponseStatusException(
@@ -79,30 +73,26 @@ public class AuthService {
         emailService.enviarOtp(usuario.getEmail(), otp);
     }
 
-    @Transactional
+    @Transactional(dontRollbackOn = InvalidOtpException.class)
     public void verifyOtp(String email, String otp) {
         Usuario usuario = usuarioRepository
                 .findByEmail(normalizarEmail(email))
                 .orElseThrow(this::invalidOtp);
 
-        if (Boolean.TRUE.equals(usuario.getActivo())) {
+        if (usuario.getActivo()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "La cuenta ya está verificada"
             );
         }
 
-        OtpCode otpCode = otpCodeRepository
-                .findTopByUsuarioAndUsadoFalseOrderByCreadoEnDesc(usuario)
-                .orElseThrow(this::invalidOtp);
+        otpService.verifyOtp(usuario.getId(), otp);
 
-        otpService.verifyOtp(otpCode, otp);
         usuario.setActivo(true);
-        usuarioRepository.save(usuario);
     }
 
     public AuthResponseDTO login(LoginRequest request) {
-        Usuario usuario = buscarUsuario(request.getEmail());
+        Usuario usuario = buscarUsuario(normalizarEmail(request.getEmail()));
 
         if (!Boolean.TRUE.equals(usuario.getActivo())) {
             throw new ResponseStatusException(

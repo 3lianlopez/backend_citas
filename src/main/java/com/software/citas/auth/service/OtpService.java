@@ -1,7 +1,5 @@
 package com.software.citas.auth.service;
 
-
-
 import com.software.citas.auth.entity.OtpCode;
 import com.software.citas.auth.entity.Usuario;
 import com.software.citas.auth.repository.OtpCodeRepository;
@@ -26,65 +24,84 @@ public class OtpService {
 
     private final OtpCodeRepository otpCodeRepository;
     private final PasswordEncoder passwordEncoder;
+
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Transactional
     public String generateOtp(Usuario usuario) {
-        LocalDateTime windowStart = LocalDateTime.now().minusMinutes(SEND_WINDOW_MINUTES);
+        Long usuarioId = usuario.getId();
+        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime inicioVentana = ahora.minusMinutes(SEND_WINDOW_MINUTES);
 
-        long envios = otpCodeRepository.countByUsuarioAndCreadoEnAfter(usuario, windowStart);
+        long envios = otpCodeRepository
+                .countByUsuarioIdAndCreadoEnAfter(usuarioId, inicioVentana);
+
         if (envios >= MAX_SENDS) {
             throw new OtpLimitExceededException(
-                    "Has solicitado demasiados códigos. Inténtalo nuevamente en unos minutos."
+                    "Has solicitado demasiados códigos. " +
+                            "Inténtalo nuevamente en unos minutos."
             );
         }
 
-        otpCodeRepository.findTopByUsuarioAndUsadoFalseOrderByCreadoEnDesc(usuario)
-                .ifPresent(anterior -> {
-                    anterior.setUsado(true);
-                    otpCodeRepository.save(anterior);
-                });
+        // Invalida el último código que todavía no haya sido utilizado.
+        otpCodeRepository
+                .findFirstByUsuarioIdAndUsadoFalseOrderByCreadoEnDesc(usuarioId)
+                .ifPresent(anterior -> anterior.setUsado(true));
 
-        String otp = String.valueOf(secureRandom.nextInt(900000) + 100000);
-        LocalDateTime ahora = LocalDateTime.now();
+        String otp = String.format(
+                "%06d",
+                secureRandom.nextInt(1_000_000)
+        );
 
-        otpCodeRepository.save(OtpCode.builder()
+        OtpCode nuevoOtp = OtpCode.builder()
                 .usuario(usuario)
                 .codigoHash(passwordEncoder.encode(otp))
                 .expiraEn(ahora.plusMinutes(EXPIRATION_MINUTES))
                 .intentos(0)
                 .usado(false)
                 .creadoEn(ahora)
-                .build());
+                .build();
 
+        otpCodeRepository.save(nuevoOtp);
+
+        // Entregar solamente al componente encargado de enviar el correo/SMS.
+        // Nunca registrarlo en logs ni devolverlo en la respuesta HTTP.
         return otp;
     }
 
-    @Transactional
-    public void verifyOtp(OtpCode otpCode, String otp) {
-        if (Boolean.TRUE.equals(otpCode.isUsado())
-                || otpCode.getExpiraEn().isBefore(LocalDateTime.now())
-                || otpCode.getIntentos() >= MAX_ATTEMPTS) {
+    @Transactional(dontRollbackOn = InvalidOtpException.class)
+    public void verifyOtp(Long usuarioId, String otp) {
+        LocalDateTime ahora = LocalDateTime.now();
+
+        OtpCode otpCode = otpCodeRepository
+                .findFirstByUsuarioIdAndUsadoFalseAndExpiraEnAfterOrderByCreadoEnDesc(
+                        usuarioId,
+                        ahora
+                )
+                .orElseThrow(this::invalidOtp);
+
+        if (otpCode.getIntentos() >= MAX_ATTEMPTS) {
             otpCode.setUsado(true);
-            otpCodeRepository.save(otpCode);
             throw invalidOtp();
         }
 
         if (!passwordEncoder.matches(otp, otpCode.getCodigoHash())) {
             int intentos = otpCode.getIntentos() + 1;
             otpCode.setIntentos(intentos);
+
             if (intentos >= MAX_ATTEMPTS) {
                 otpCode.setUsado(true);
             }
-            otpCodeRepository.save(otpCode);
+
             throw invalidOtp();
         }
 
         otpCode.setUsado(true);
-        otpCodeRepository.save(otpCode);
     }
 
     private InvalidOtpException invalidOtp() {
-        return new InvalidOtpException("Código OTP inválido o expirado");
+        return new InvalidOtpException(
+                "Código OTP inválido o expirado"
+        );
     }
 }
