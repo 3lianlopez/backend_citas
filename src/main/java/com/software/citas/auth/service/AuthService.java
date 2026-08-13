@@ -4,9 +4,9 @@ package com.software.citas.auth.service;
 import com.software.citas.auth.dto.AuthResponseDTO;
 import com.software.citas.auth.dto.LoginRequest;
 import com.software.citas.auth.dto.RegisterRequest;
-import com.software.citas.auth.entity.OtpCode;
+//import com.software.citas.auth.entity.OtpCode;
 import com.software.citas.auth.entity.Usuario;
-import com.software.citas.auth.repository.OtpCodeRepository;
+// com.software.citas.auth.repository.OtpCodeRepository;
 import com.software.citas.auth.repository.UsuarioRepository;
 import com.software.citas.exception.InvalidOtpException;
 import com.software.citas.security.JwtService;
@@ -26,9 +26,9 @@ import java.util.Locale;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
-    private final OtpCodeRepository otpCodeRepository;
-    private final OtpService otpService;
-    private final EmailService emailService;
+    //private final OtpCodeRepository otpCodeRepository;
+    //private final OtpService otpService;
+    //private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -55,51 +55,51 @@ public class AuthService {
 
         usuarioRepository.save(usuario);
 
-        String otp = otpService.generateOtp(usuario);
-        emailService.enviarOtp(usuario.getEmail(), otp);
+        //String otp = otpService.generateOtp(usuario);
+        //emailService.enviarOtp(usuario.getEmail(), otp);
     }
 
-    public void requestOtp(String email) {
-        Usuario usuario = buscarUsuario(normalizarEmail(email));
+//    public void requestOtp(String email) {
+//        Usuario usuario = buscarUsuario(normalizarEmail(email));
+//
+//        if (Boolean.TRUE.equals(usuario.getActivo())) {
+//            throw new ResponseStatusException(
+//                    HttpStatus.BAD_REQUEST,
+//                    "La cuenta ya está verificada"
+//            );
+//        }
+//
+//        String otp = otpService.generateOtp(usuario);
+//        emailService.enviarOtp(usuario.getEmail(), otp);
+//    }
 
-        if (Boolean.TRUE.equals(usuario.getActivo())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La cuenta ya está verificada"
-            );
-        }
-
-        String otp = otpService.generateOtp(usuario);
-        emailService.enviarOtp(usuario.getEmail(), otp);
-    }
-
-    @Transactional(dontRollbackOn = InvalidOtpException.class)
-    public void verifyOtp(String email, String otp) {
-        Usuario usuario = usuarioRepository
-                .findByEmail(normalizarEmail(email))
-                .orElseThrow(this::invalidOtp);
-
-        if (usuario.getActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La cuenta ya está verificada"
-            );
-        }
-
-        otpService.verifyOtp(usuario.getId(), otp);
-
-        usuario.setActivo(true);
-    }
+//    @Transactional(dontRollbackOn = InvalidOtpException.class)
+//    public void verifyOtp(String email, String otp) {
+//        Usuario usuario = usuarioRepository
+//                .findByEmail(normalizarEmail(email))
+//                .orElseThrow(this::invalidOtp);
+//
+//        if (usuario.getActivo()) {
+//            throw new ResponseStatusException(
+//                    HttpStatus.BAD_REQUEST,
+//                    "La cuenta ya está verificada"
+//            );
+//        }
+//
+//        otpService.verifyOtp(usuario.getId(), otp);
+//
+//        usuario.setActivo(true);
+//    }
 
     public AuthResponseDTO login(LoginRequest request) {
         Usuario usuario = buscarUsuario(normalizarEmail(request.getEmail()));
 
-        if (!Boolean.TRUE.equals(usuario.getActivo())) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "Debes verificar tu correo antes de iniciar sesión"
-            );
-        }
+//        if (!Boolean.TRUE.equals(usuario.getActivo())) {
+//            throw new ResponseStatusException(
+//                    HttpStatus.FORBIDDEN,
+//                    "Debes verificar tu correo antes de iniciar sesión"
+//            );
+//        }
 
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPasswordHash())) {
             throw credencialesInvalidas();
@@ -125,7 +125,7 @@ public class AuthService {
         );
     }
 
-    private InvalidOtpException invalidOtp() {
-        return new InvalidOtpException("Código OTP inválido o expirado");
-    }
+//    private InvalidOtpException invalidOtp() {
+//        return new InvalidOtpException("Código OTP inválido o expirado");
+//    }
 }

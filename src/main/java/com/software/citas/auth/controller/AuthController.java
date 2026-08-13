@@ -27,23 +27,23 @@ public class AuthController {
         ));
     }
 
-    @PostMapping("/request-otp")
-    public ResponseEntity<?> requestOtp(@Valid @RequestBody RequestOtpDTO request) {
-        authService.requestOtp(request.getEmail());
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Si la cuenta está pendiente, se envió un nuevo OTP"
-        ));
-    }
+//    @PostMapping("/request-otp")
+//    public ResponseEntity<?> requestOtp(@Valid @RequestBody RequestOtpDTO request) {
+//        authService.requestOtp(request.getEmail());
+//        return ResponseEntity.ok(Map.of(
+//                "success", true,
+//                "message", "Si la cuenta está pendiente, se envió un nuevo OTP"
+//        ));
+//    }
 
-    @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpDTO request) {
-        authService.verifyOtp(request.getEmail(), request.getOtp());
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Correo verificado correctamente"
-        ));
-    }
+//    @PostMapping("/verify-otp")
+//    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpDTO request) {
+//        authService.verifyOtp(request.getEmail(), request.getOtp());
+//        return ResponseEntity.ok(Map.of(
+//                "success", true,
+//                "message", "Correo verificado correctamente"
+//        ));
+//    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequest request) {
