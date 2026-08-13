@@ -39,7 +39,7 @@ public class Usuario {
     // false mientras el correo no haya sido verificado mediante OTP.
     @Builder.Default
     @Column(nullable = false)
-    private Boolean activo = false;
+    private Boolean activo = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime creadoEn;

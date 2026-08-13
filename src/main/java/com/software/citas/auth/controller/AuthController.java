@@ -45,6 +45,11 @@ public class AuthController {
 //        ));
 //    }
 
+    @GetMapping("/favicon.ico")
+    public ResponseEntity<Void> favicon() {
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
